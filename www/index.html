@@ -17,6 +17,9 @@
 		<ion-side-menu-content>
 			<ion-header-bar class="bar-dark">
 				<h1 class="title">Todo</h1>
+        <button class="button button-icon" ng-click="newTask()">
+          <i class="icon ion-compose"></i>
+        </button>
 			</ion-header-bar>
 			<ion-content>
 				<ion-list>
@@ -33,6 +36,35 @@
 				<h1 class="title">Projects</h1>
 			</ion-header-bar>
 		</ion-side-menu>
+
+    <script id="new-task.html" type="text/ng-template">
+
+      <div class="modal">
+        <ion-header-bar class="bar-secondary">
+          <button class="button button-clear button-positive"
+            ng-click="closeNewTask()">
+            Cancel
+          </button>
+        </ion-header-bar>
+
+        <!-- modal content -->
+        <ion-content>
+          <form ng-submit="createTask(task)">
+            <div class="list">
+              <label class="item item-input">
+                <input id="title" type="text" name="title"
+                  placeholder="what do you need to do?"
+                  ng-model="task.title">
+              </label>
+            </div><!-- list -->
+            <div class="padding">
+              <button type="submit" class="button button-block button-positive">Create Task</button>
+            </div>
+          </form>
+
+        </ion-content>
+      </div>
+    </script>
 
 	</ion-side-menus>
 </body>
