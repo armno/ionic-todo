@@ -16,9 +16,62 @@ angular.module('todo', ['ionic'])
   });
 })
 
-.controller('TodoCtrl', ['$scope', '$ionicModal',
-  function($scope, $ionicModal) {
-	$scope.tasks = [];
+.factory('Projects', [function() {
+  return {
+    all: function() {
+      var projectString = localStorage.getItem('projects');
+      if (projectString) {
+        return angular.fromJson(projectString);
+      }
+      return [];
+    },
+    save: function(projects) {
+      localStorage.setItem('projects', angular.toJson(projects));
+    },
+    newProject: function(projectTitle) {
+      return {
+        title: projectTitle,
+        tasks: []
+      };
+    },
+    getLastActiveIndex: function() {
+      return parseInt(localStorage.getItem('lastActiveProject', 10)) || 0;
+    },
+    setLastActiveIndex: function(index) {
+      localStorage.setItem('lastActiveProject', index);
+    }
+  };
+}]);
+
+.controller('TodoCtrl',
+  ['$scope', '$ionicModal', '$timeout', 'Projects', '$ionicSideMenuDelegate',
+  function($scope, $ionicModal, $timeout, Projects, $ionicSideMenuDelegate) {
+
+  var createProject = function(title) {
+    var newProject = Projects.newProject(projectTitle);
+    $scope.projects.push(newProject);
+    Projects.save($scope.projects);
+    $scope.selectProject(newProject, $scope.projects.length - 1);
+  };
+
+  // load or initialize projects
+  $scope.projects = Projects.all();
+
+  // grab the last active, or the first project
+  $scope.activeProject = $scope.projects[Projects.getLastActiveIndex()];
+
+  $scope.newProject = function() {
+    var projectTitle = prompt('Project name');
+    if (projectTitle) {
+      createProject(projectTitle);
+    }
+  };
+
+  $scope.selectProject = function(project, index) {
+    $scope.activeProject = project;
+    Projects.setLastActiveIndex(index);
+    $ionicSideMenuDelegate.toggleLeft(false);
+  };
 
   // create and load the modal
   $ionicModal.fromTemplateUrl('new-task.html', function(modal) {
@@ -46,4 +99,22 @@ angular.module('todo', ['ionic'])
   $scope.closeNewTask = function() {
     $scope.taskModal.hide();
   };
+
+  $scope.toggleProjects = function() {
+    $ionicSideMenuDelegate.toggleLeft();
+  };
+
+  // try to create the first project, make sure to defer
+  // this by using $timeout so everything is initialized properly
+  $timeout(function() {
+    if ($scope.projects.length === 0) {
+      while(true) {
+        var projectTitle = prompt('Your first project title: ');
+        if (projectTitle) {
+          createProject(projectTitle);
+          break;
+        }
+      }
+    }
+  });
 }])
