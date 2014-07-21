@@ -41,14 +41,14 @@ angular.module('todo', ['ionic'])
       localStorage.setItem('lastActiveProject', index);
     }
   };
-}]);
+}])
 
 .controller('TodoCtrl',
   ['$scope', '$ionicModal', '$timeout', 'Projects', '$ionicSideMenuDelegate',
   function($scope, $ionicModal, $timeout, Projects, $ionicSideMenuDelegate) {
 
   var createProject = function(title) {
-    var newProject = Projects.newProject(projectTitle);
+    var newProject = Projects.newProject(title);
     $scope.projects.push(newProject);
     Projects.save($scope.projects);
     $scope.selectProject(newProject, $scope.projects.length - 1);
